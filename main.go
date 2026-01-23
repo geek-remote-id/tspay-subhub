@@ -116,12 +116,44 @@ func updateCategory(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
+	// Fetch existing category first
+	var existingCategory Category
+	var existingDeletedAt sql.NullTime
+	err = db.QueryRow(
+		"SELECT id, name, description, deleted_at FROM category WHERE id = $1 AND deleted_at IS NULL",
+		id,
+	).Scan(&existingCategory.ID, &existingCategory.Name, &existingCategory.Description, &existingDeletedAt)
+
+	if err == sql.ErrNoRows {
+		WriteJSON(w, http.StatusNotFound, Response{
+			Status:  "failed",
+			Message: "Category not found",
+		})
+		return
+	}
+
+	if err != nil {
+		WriteJSON(w, http.StatusInternalServerError, Response{
+			Status:  "failed",
+			Message: "Failed to fetch category: " + err.Error(),
+		})
+		return
+	}
+
+	// Merge: only update fields that are provided in request body
+	if updateCategory.Name != "" {
+		existingCategory.Name = updateCategory.Name
+	}
+	if updateCategory.Description != "" {
+		existingCategory.Description = updateCategory.Description
+	}
+
 	// Update category di database
 	var deletedAt sql.NullTime
 	err = db.QueryRow(
 		"UPDATE category SET name = $1, description = $2 WHERE id = $3 AND deleted_at IS NULL RETURNING id, name, description, deleted_at",
-		updateCategory.Name, updateCategory.Description, id,
-	).Scan(&updateCategory.ID, &updateCategory.Name, &updateCategory.Description, &deletedAt)
+		existingCategory.Name, existingCategory.Description, id,
+	).Scan(&existingCategory.ID, &existingCategory.Name, &existingCategory.Description, &deletedAt)
 
 	if err == sql.ErrNoRows {
 		WriteJSON(w, http.StatusNotFound, Response{
@@ -140,13 +172,13 @@ func updateCategory(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	if deletedAt.Valid {
-		updateCategory.DeletedAt = timestamppb.New(deletedAt.Time)
+		existingCategory.DeletedAt = timestamppb.New(deletedAt.Time)
 	}
 
 	WriteJSON(w, http.StatusOK, Response{
 		Status:  "success",
 		Message: "Category updated successfully",
-		Data:    updateCategory,
+		Data:    existingCategory,
 	})
 }
 
