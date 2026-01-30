@@ -38,10 +38,15 @@ func main() {
 	}
 
 	// Dynamic Swagger Host
-	docs.SwaggerInfo.Host = viper.GetString("APP_HOST")
-	if docs.SwaggerInfo.Host == "" {
+	appHost := viper.GetString("APP_HOST")
+	if appHost != "" {
+		docs.SwaggerInfo.Host = appHost
+		docs.SwaggerInfo.Schemes = []string{"https", "http"}
+	} else {
 		docs.SwaggerInfo.Host = "localhost:" + portStr
+		docs.SwaggerInfo.Schemes = []string{"http"}
 	}
+	log.Println("Swagger Host set to:", docs.SwaggerInfo.Host)
 
 	// connect to DB
 	dbConnStr := viper.GetString("DATABASE_URL")
