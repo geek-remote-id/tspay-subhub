@@ -54,7 +54,7 @@ func (r *ProductRepository) GetByID(id int) (models.Product, error) {
 
 	err := r.db.QueryRow(query, id).Scan(
 		&p.ID, &p.Name, &p.Price, &p.Stock, &p.CategoryID, &deletedAt,
-		&c.ID, &c.Name, &c.Description,
+		&c.Name,
 	)
 
 	if err != nil {
