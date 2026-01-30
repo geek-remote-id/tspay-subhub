@@ -17,7 +17,26 @@ const docTemplate = `{
     "paths": {
         "/category": {
             "get": {
-                "description": "Get a list of all active categories",
+                "responses": {}
+            },
+            "post": {
+                "responses": {}
+            }
+        },
+        "/category/{id}": {
+            "get": {
+                "responses": {}
+            },
+            "put": {
+                "responses": {}
+            },
+            "delete": {
+                "responses": {}
+            }
+        },
+        "/product": {
+            "get": {
+                "description": "Get a list of all active products",
                 "consumes": [
                     "application/json"
                 ],
@@ -25,41 +44,26 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "category"
+                    "product"
                 ],
-                "summary": "Get all categories",
+                "summary": "Get all products",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/main.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/main.Category"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/utils.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.Response"
+                            "$ref": "#/definitions/utils.Response"
                         }
                     }
                 }
             },
             "post": {
-                "description": "Create a new category with name and description",
+                "description": "Create a new product with the provided details",
                 "consumes": [
                     "application/json"
                 ],
@@ -67,17 +71,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "category"
+                    "product"
                 ],
-                "summary": "Create a new category",
+                "summary": "Create a new product",
                 "parameters": [
                     {
-                        "description": "Category Data",
-                        "name": "category",
+                        "description": "Product Data",
+                        "name": "product",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.Category"
+                            "$ref": "#/definitions/models.Product"
                         }
                     }
                 ],
@@ -85,39 +89,27 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/main.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/main.Category"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/utils.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.Response"
+                            "$ref": "#/definitions/utils.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.Response"
+                            "$ref": "#/definitions/utils.Response"
                         }
                     }
                 }
             }
         },
-        "/category/{id}": {
+        "/product/{id}": {
             "get": {
-                "description": "Get a category by its ID",
+                "description": "Get a product by its ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -125,13 +117,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "category"
+                    "product"
                 ],
-                "summary": "Get a category by ID",
+                "summary": "Get a product by ID",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Category ID",
+                        "description": "Product ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -141,43 +133,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/main.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/main.Category"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/utils.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.Response"
+                            "$ref": "#/definitions/utils.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/main.Response"
+                            "$ref": "#/definitions/utils.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.Response"
+                            "$ref": "#/definitions/utils.Response"
                         }
                     }
                 }
             },
             "put": {
-                "description": "Update a category by ID",
+                "description": "Update a product by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -185,24 +165,24 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "category"
+                    "product"
                 ],
-                "summary": "Update a category",
+                "summary": "Update a product",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Category ID",
+                        "description": "Product ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Category Data",
-                        "name": "category",
+                        "description": "Product Data",
+                        "name": "product",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.Category"
+                            "$ref": "#/definitions/models.Product"
                         }
                     }
                 ],
@@ -210,43 +190,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/main.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/main.Category"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/utils.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.Response"
+                            "$ref": "#/definitions/utils.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/main.Response"
+                            "$ref": "#/definitions/utils.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.Response"
+                            "$ref": "#/definitions/utils.Response"
                         }
                     }
                 }
             },
             "delete": {
-                "description": "Soft delete a category by ID",
+                "description": "Soft delete a product by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -254,13 +222,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "category"
+                    "product"
                 ],
-                "summary": "Delete a category",
+                "summary": "Delete a product",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Category ID",
+                        "description": "Product ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -270,25 +238,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.Response"
+                            "$ref": "#/definitions/utils.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/main.Response"
+                            "$ref": "#/definitions/utils.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.Response"
+                            "$ref": "#/definitions/utils.Response"
                         }
                     }
                 }
@@ -296,10 +258,10 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "main.Category": {
+        "models.Product": {
             "type": "object"
         },
-        "main.Response": {
+        "utils.Response": {
             "type": "object",
             "properties": {
                 "data": {},
@@ -317,7 +279,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "",
 	BasePath:         "/api",
 	Schemes:          []string{},
 	Title:            "Kasir API",

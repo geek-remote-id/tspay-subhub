@@ -20,6 +20,14 @@ func NewProductHandler(service *services.ProductService) *ProductHandler {
 	return &ProductHandler{Service: service}
 }
 
+// GetProducts godoc
+// @Summary      Get all products
+// @Description  Get a list of all active products
+// @Tags         product
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  utils.Response
+// @Failure      500  {object}  utils.Response
 // @Router       /product [get]
 func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 	products, err := h.Service.GetAll()
@@ -38,6 +46,17 @@ func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// GetProductByID godoc
+// @Summary      Get a product by ID
+// @Description  Get a product by its ID
+// @Tags         product
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int  true  "Product ID"
+// @Success      200  {object}  utils.Response
+// @Failure      400  {object}  utils.Response
+// @Failure      404  {object}  utils.Response
+// @Failure      500  {object}  utils.Response
 // @Router       /product/{id} [get]
 func (h *ProductHandler) GetProductByID(w http.ResponseWriter, r *http.Request) {
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/product/")
@@ -74,6 +93,16 @@ func (h *ProductHandler) GetProductByID(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
+// CreateProduct godoc
+// @Summary      Create a new product
+// @Description  Create a new product with the provided details
+// @Tags         product
+// @Accept       json
+// @Produce      json
+// @Param        product  body      models.Product  true  "Product Data"
+// @Success      201      {object}  utils.Response
+// @Failure      400      {object}  utils.Response
+// @Failure      500      {object}  utils.Response
 // @Router       /product [post]
 func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	var productReq models.Product
@@ -102,6 +131,18 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// UpdateProduct godoc
+// @Summary      Update a product
+// @Description  Update a product by ID
+// @Tags         product
+// @Accept       json
+// @Produce      json
+// @Param        id       path      int             true  "Product ID"
+// @Param        product  body      models.Product  true  "Product Data"
+// @Success      200      {object}  utils.Response
+// @Failure      400      {object}  utils.Response
+// @Failure      404      {object}  utils.Response
+// @Failure      500      {object}  utils.Response
 // @Router       /product/{id} [put]
 func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/product/")
@@ -169,6 +210,16 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// DeleteProduct godoc
+// @Summary      Delete a product
+// @Description  Soft delete a product by ID
+// @Tags         product
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int  true  "Product ID"
+// @Success      200  {object}  utils.Response
+// @Failure      400  {object}  utils.Response
+// @Failure      500  {object}  utils.Response
 // @Router       /product/{id} [delete]
 func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/product/")

@@ -1,8 +1,8 @@
 basePath: /api
 definitions:
-  main.Category:
+  models.Product:
     type: object
-  main.Response:
+  utils.Response:
     properties:
       data: {}
       message:
@@ -10,7 +10,6 @@ definitions:
       status:
         type: string
     type: object
-host: localhost:8080
 info:
   contact: {}
   description: This is a sample server for a Cashier System.
@@ -19,71 +18,71 @@ info:
 paths:
   /category:
     get:
+      responses: {}
+    post:
+      responses: {}
+  /category/{id}:
+    delete:
+      responses: {}
+    get:
+      responses: {}
+    put:
+      responses: {}
+  /product:
+    get:
       consumes:
       - application/json
-      description: Get a list of all active categories
+      description: Get a list of all active products
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/main.Response'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/main.Category'
-                  type: array
-              type: object
+            $ref: '#/definitions/utils.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/main.Response'
-      summary: Get all categories
+            $ref: '#/definitions/utils.Response'
+      summary: Get all products
       tags:
-      - category
+      - product
     post:
       consumes:
       - application/json
-      description: Create a new category with name and description
+      description: Create a new product with the provided details
       parameters:
-      - description: Category Data
+      - description: Product Data
         in: body
-        name: category
+        name: product
         required: true
         schema:
-          $ref: '#/definitions/main.Category'
+          $ref: '#/definitions/models.Product'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            allOf:
-            - $ref: '#/definitions/main.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/main.Category'
-              type: object
+            $ref: '#/definitions/utils.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/main.Response'
+            $ref: '#/definitions/utils.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/main.Response'
-      summary: Create a new category
+            $ref: '#/definitions/utils.Response'
+      summary: Create a new product
       tags:
-      - category
-  /category/{id}:
+      - product
+  /product/{id}:
     delete:
       consumes:
       - application/json
-      description: Soft delete a category by ID
+      description: Soft delete a product by ID
       parameters:
-      - description: Category ID
+      - description: Product ID
         in: path
         name: id
         required: true
@@ -94,28 +93,24 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.Response'
+            $ref: '#/definitions/utils.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/main.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/main.Response'
+            $ref: '#/definitions/utils.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/main.Response'
-      summary: Delete a category
+            $ref: '#/definitions/utils.Response'
+      summary: Delete a product
       tags:
-      - category
+      - product
     get:
       consumes:
       - application/json
-      description: Get a category by its ID
+      description: Get a product by its ID
       parameters:
-      - description: Category ID
+      - description: Product ID
         in: path
         name: id
         required: true
@@ -126,68 +121,58 @@ paths:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/main.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/main.Category'
-              type: object
+            $ref: '#/definitions/utils.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/main.Response'
+            $ref: '#/definitions/utils.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/main.Response'
+            $ref: '#/definitions/utils.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/main.Response'
-      summary: Get a category by ID
+            $ref: '#/definitions/utils.Response'
+      summary: Get a product by ID
       tags:
-      - category
+      - product
     put:
       consumes:
       - application/json
-      description: Update a category by ID
+      description: Update a product by ID
       parameters:
-      - description: Category ID
+      - description: Product ID
         in: path
         name: id
         required: true
         type: integer
-      - description: Category Data
+      - description: Product Data
         in: body
-        name: category
+        name: product
         required: true
         schema:
-          $ref: '#/definitions/main.Category'
+          $ref: '#/definitions/models.Product'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/main.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/main.Category'
-              type: object
+            $ref: '#/definitions/utils.Response'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/main.Response'
+            $ref: '#/definitions/utils.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/main.Response'
+            $ref: '#/definitions/utils.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/main.Response'
-      summary: Update a category
+            $ref: '#/definitions/utils.Response'
+      summary: Update a product
       tags:
-      - category
+      - product
 swagger: "2.0"
