@@ -11,20 +11,13 @@ import (
 
 	"kasir-api/database"
 	"kasir-api/docs"
+	"kasir-api/models"
 
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
-
-// Category represents a category in the cashier system
-type Category struct {
-	ID          int                    `json:"id"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	DeletedAt   *timestamppb.Timestamp `json:"deleted_at"`
-}
 
 // Response represents the standardized API response format
 type Response struct {
@@ -111,8 +104,8 @@ func deleteCategory(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 // @Accept       json
 // @Produce      json
 // @Param        id        path      int       true  "Category ID"
-// @Param        category  body      Category  true  "Category Data"
-// @Success      200       {object}  Response{data=Category}
+// @Param        category  body      models.Category  true  "Category Data"
+// @Success      200       {object}  Response{data=models.Category}
 // @Failure      400       {object}  Response
 // @Failure      404       {object}  Response
 // @Failure      500       {object}  Response
@@ -132,7 +125,7 @@ func updateCategory(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	// get data dari request
-	var updateCategory Category
+	var updateCategory models.Category
 	err = json.NewDecoder(r.Body).Decode(&updateCategory)
 	if err != nil {
 		WriteJSON(w, http.StatusBadRequest, Response{
@@ -143,7 +136,7 @@ func updateCategory(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	// Fetch existing category first
-	var existingCategory Category
+	var existingCategory models.Category
 	var existingDeletedAt sql.NullTime
 	err = db.QueryRow(
 		"SELECT id, name, description, deleted_at FROM category WHERE id = $1 AND deleted_at IS NULL",
@@ -215,7 +208,7 @@ func updateCategory(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 // @Accept       json
 // @Produce      json
 // @Param        id   path      int  true  "Category ID"
-// @Success      200  {object}  Response{data=Category}
+// @Success      200  {object}  Response{data=models.Category}
 // @Failure      400  {object}  Response
 // @Failure      404  {object}  Response
 // @Failure      500  {object}  Response
@@ -234,7 +227,7 @@ func getCategoryByID(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	// Query category dari database
-	var c Category
+	var c models.Category
 	var deletedAt sql.NullTime
 	err = db.QueryRow(
 		"SELECT id, name, description, deleted_at FROM category WHERE id = $1 AND deleted_at IS NULL",
@@ -357,7 +350,7 @@ func main() {
 // @Tags         category
 // @Accept       json
 // @Produce      json
-// @Success      200  {object}  Response{data=[]Category}
+// @Success      200  {object}  Response{data=[]models.Category}
 // @Failure      500  {object}  Response
 // @Router       /category [get]
 func getCategories(w http.ResponseWriter, r *http.Request, db *sql.DB) {
@@ -371,9 +364,9 @@ func getCategories(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 	defer rows.Close()
 
-	var categories []Category
+	var categories []models.Category
 	for rows.Next() {
-		var c Category
+		var c models.Category
 		var deletedAt sql.NullTime
 		if err := rows.Scan(&c.ID, &c.Name, &c.Description, &deletedAt); err != nil {
 			WriteJSON(w, http.StatusInternalServerError, Response{
@@ -401,14 +394,14 @@ func getCategories(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 // @Tags         category
 // @Accept       json
 // @Produce      json
-// @Param        category  body      Category  true  "Category Data"
-// @Success      201       {object}  Response{data=Category}
+// @Param        category  body      models.Category  true  "Category Data"
+// @Success      201       {object}  Response{data=models.Category}
 // @Failure      400       {object}  Response
 // @Failure      500       {object}  Response
 // @Router       /category [post]
 func createCategory(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	// baca data dari request
-	var categoryBaru Category
+	var categoryBaru models.Category
 	err := json.NewDecoder(r.Body).Decode(&categoryBaru)
 	if err != nil {
 		WriteJSON(w, http.StatusBadRequest, Response{
