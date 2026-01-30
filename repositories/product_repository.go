@@ -43,6 +43,7 @@ func (r *ProductRepository) GetByID(id int) (models.Product, error) {
 	var p models.Product
 	var c models.Category
 	var deletedAt sql.NullTime
+	var categoryName sql.NullString
 
 	query := `
 		SELECT p.id, p.name, p.price, p.stock, p.category_id, p.deleted_at, 
@@ -54,14 +55,17 @@ func (r *ProductRepository) GetByID(id int) (models.Product, error) {
 
 	err := r.db.QueryRow(query, id).Scan(
 		&p.ID, &p.Name, &p.Price, &p.Stock, &p.CategoryID, &deletedAt,
-		&c.Name,
+		&categoryName,
 	)
 
 	if err != nil {
 		return models.Product{}, err
 	}
 
-	p.Category = &c
+	if categoryName.Valid {
+		c.Name = categoryName.String
+		p.Category = &c
+	}
 
 	if deletedAt.Valid {
 		p.DeletedAt = timestamppb.New(deletedAt.Time)

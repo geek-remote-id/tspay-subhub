@@ -4,8 +4,8 @@ import "google.golang.org/protobuf/types/known/timestamppb"
 
 // Category represents a category in the cashier system
 type Category struct {
-	ID          int                    `json:"id"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	DeletedAt   *timestamppb.Timestamp `json:"deleted_at"`
+	ID          int                    `json:"id,omitempty"`
+	Name        string                 `json:"name,omitempty"`
+	Description string                 `json:"description,omitempty"`
+	DeletedAt   *timestamppb.Timestamp `json:"deleted_at,omitempty"`
 }
