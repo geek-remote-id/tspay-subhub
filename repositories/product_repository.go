@@ -16,8 +16,15 @@ func NewProductRepository(db *sql.DB) *ProductRepository {
 }
 
 // GetAll retrieves all active products
-func (r *ProductRepository) GetAll() ([]models.Product, error) {
-	rows, err := r.db.Query("SELECT id, name, price, stock, category_id, deleted_at FROM product WHERE deleted_at IS NULL")
+func (r *ProductRepository) GetAll(name string) ([]models.Product, error) {
+	args := []interface{}{}
+	query := "SELECT id, name, price, stock, category_id, deleted_at FROM product WHERE deleted_at IS NULL"
+	if name != "" {
+		query += " AND name ILIKE $1"
+		args = append(args, "%"+name+"%")
+	}
+
+	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}

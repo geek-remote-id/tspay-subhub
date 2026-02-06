@@ -30,7 +30,8 @@ func NewProductHandler(service *services.ProductService) *ProductHandler {
 // @Failure      500  {object}  utils.Response
 // @Router       /product [get]
 func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
-	products, err := h.Service.GetAll()
+	name := r.URL.Query().Get("name")
+	products, err := h.Service.GetAll(name)
 	if err != nil {
 		utils.WriteJSON(w, http.StatusInternalServerError, utils.Response{
 			Status:  "failed",
