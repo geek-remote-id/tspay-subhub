@@ -1,8 +1,63 @@
 basePath: /api
 definitions:
   models.Category:
+    properties:
+      deleted_at:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  models.CheckoutItem:
+    properties:
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+    type: object
+  models.CheckoutRequest:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/models.CheckoutItem'
+        type: array
     type: object
   models.Product:
+    properties:
+      category:
+        $ref: '#/definitions/models.Category'
+      category_id:
+        type: integer
+      deleted_at:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: integer
+      stock:
+        type: integer
+    type: object
+  timestamppb.Timestamp:
+    properties:
+      nanos:
+        description: |-
+          Non-negative fractions of a second at nanosecond resolution. This field is
+          the nanosecond portion of the duration, not an alternative to seconds.
+          Negative second values with fractions must still have non-negative nanos
+          values that count forward in time. Must be between 0 and 999,999,999
+          inclusive.
+        type: integer
+      seconds:
+        description: |-
+          Represents seconds of UTC time since Unix epoch 1970-01-01T00:00:00Z. Must
+          be between -315576000000 and 315576000000 inclusive (which corresponds to
+          0001-01-01T00:00:00Z to 9999-12-31T23:59:59Z).
+        type: integer
     type: object
   utils.Response:
     properties:
@@ -169,6 +224,36 @@ paths:
       summary: Update a category
       tags:
       - category
+  /checkout:
+    post:
+      consumes:
+      - application/json
+      description: Create a new transaction by processing checkout items
+      parameters:
+      - description: Checkout Data
+        in: body
+        name: checkout
+        required: true
+        schema:
+          $ref: '#/definitions/models.CheckoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Process checkout
+      tags:
+      - transaction
   /product:
     get:
       consumes:

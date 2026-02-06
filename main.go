@@ -147,6 +147,22 @@ func main() {
 		}
 	})
 
+	http.HandleFunc("/api/checkout", func(w http.ResponseWriter, r *http.Request) {
+		transactionRepo := repositories.NewTransactionRepository(db)
+		transactionService := services.NewTransactionService(transactionRepo)
+		transactionHandler := handlers.NewTransactionHandler(transactionService)
+
+		switch r.Method {
+		case "POST":
+			transactionHandler.Checkout(w, r)
+		default:
+			utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Response{
+				Status:  "failed",
+				Message: "Method not allowed",
+			})
+		}
+	})
+
 	fmt.Println("Server running on http://localhost:" + portStr)
 	err = http.ListenAndServe(":"+portStr, nil)
 	if err != nil {
