@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	_ "github.com/lib/pq"
 )
@@ -11,6 +12,16 @@ import (
 func Connect(connStr string) (*sql.DB, error) {
 	if connStr == "" {
 		return nil, fmt.Errorf("connection string is empty")
+	}
+
+	// Add timezone parameter if not already present
+	// This ensures all timestamps are in Asia/Jakarta timezone (UTC+7)
+	if !contains(connStr, "timezone=") {
+		if contains(connStr, "?") {
+			connStr += "&timezone=Asia/Jakarta"
+		} else {
+			connStr += "?timezone=Asia/Jakarta"
+		}
 	}
 
 	db, err := sql.Open("postgres", connStr)
@@ -24,4 +35,9 @@ func Connect(connStr string) (*sql.DB, error) {
 	}
 
 	return db, nil
+}
+
+// Helper function to check if string contains substring
+func contains(s, substr string) bool {
+	return strings.Contains(s, substr)
 }
