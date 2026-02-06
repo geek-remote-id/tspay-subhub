@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"kasir-api/models"
 	"strings"
+	"time"
 )
 
 type TransactionRepository struct {
@@ -119,12 +120,19 @@ func (repo *TransactionRepository) CreateTransaction(items []models.CheckoutItem
 		Details:     details,
 	}
 
+	// Load Asia/Jakarta timezone (UTC+7)
+	loc, err := time.LoadLocation("Asia/Jakarta")
+	if err != nil {
+		// Fallback to local timezone if Asia/Jakarta is not available
+		loc = time.Local
+	}
+
 	if createdAt.Valid {
-		transaction.CreatedAt = createdAt.Time.Format("2006-01-02 15:04:05")
+		transaction.CreatedAt = createdAt.Time.In(loc).Format("2006-01-02 15:04:05")
 	}
 
 	if deletedAt.Valid {
-		transaction.DeletedAt = deletedAt.Time.Format("2006-01-02 15:04:05")
+		transaction.DeletedAt = deletedAt.Time.In(loc).Format("2006-01-02 15:04:05")
 	}
 
 	return transaction, nil

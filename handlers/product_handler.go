@@ -26,6 +26,7 @@ func NewProductHandler(service *services.ProductService) *ProductHandler {
 // @Tags         product
 // @Accept       json
 // @Produce      json
+// @Param        name  query     string  false  "Filter products by name (case-insensitive)"
 // @Success      200  {object}  utils.Response
 // @Failure      500  {object}  utils.Response
 // @Router       /product [get]

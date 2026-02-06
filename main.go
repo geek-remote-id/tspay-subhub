@@ -163,6 +163,39 @@ func main() {
 		}
 	})
 
+	// sales summary
+	http.HandleFunc("/api/report/hari-ini", func(w http.ResponseWriter, r *http.Request) {
+		reportRepo := repositories.NewReportRepository(db)
+		reportService := services.NewReportService(reportRepo)
+		reportHandler := handlers.NewReportHandler(reportService)
+
+		switch r.Method {
+		case "GET":
+			reportHandler.GetDailySalesReport(w, r)
+		default:
+			utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Response{
+				Status:  "failed",
+				Message: "Method not allowed",
+			})
+		}
+	})
+
+	http.HandleFunc("/api/report", func(w http.ResponseWriter, r *http.Request) {
+		reportRepo := repositories.NewReportRepository(db)
+		reportService := services.NewReportService(reportRepo)
+		reportHandler := handlers.NewReportHandler(reportService)
+
+		switch r.Method {
+		case "GET":
+			reportHandler.GetSalesReportByDateRange(w, r)
+		default:
+			utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Response{
+				Status:  "failed",
+				Message: "Method not allowed",
+			})
+		}
+	})
+
 	fmt.Println("Server running on http://localhost:" + portStr)
 	err = http.ListenAndServe(":"+portStr, nil)
 	if err != nil {
