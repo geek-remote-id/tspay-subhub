@@ -1,8 +1,8 @@
 package handlers
 
 import (
+	"fmt"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/geek-remote-id/tspay-subhub/services"
@@ -25,7 +25,7 @@ func GenerateDepositCallbackHandler() http.HandlerFunc {
 		// 1. Read body first so we can log it (Body can only be read once)
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
-			log.Printf("Error reading body: %v", err)
+			utils.LogEvent("errors", "Error reading body: "+err.Error())
 			utils.WriteJSON(w, http.StatusBadRequest, utils.Response{
 				Status:  "error",
 				Message: "Could not read request body",
@@ -39,7 +39,7 @@ func GenerateDepositCallbackHandler() http.HandlerFunc {
 
 		// 3. Method check
 		if r.Method != http.MethodPost {
-			log.Printf("Method %s not allowed", r.Method)
+			utils.LogEvent("errors", "Method "+r.Method+" not allowed")
 			utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Response{
 				Status:  "error",
 				Message: "Method not allowed",
@@ -50,11 +50,11 @@ func GenerateDepositCallbackHandler() http.HandlerFunc {
 		// 4. Handle webhook headers
 		signature := r.Header.Get("X-Webhook-Signature")
 		timestamp := r.Header.Get("X-Webhook-Timestamp")
-		log.Printf("Incoming signature = %s, timestamp = %s", signature, timestamp)
+		utils.LogEvent("events", fmt.Sprintf("Incoming signature = %s, timestamp = %s", signature, timestamp))
 
 		// 5. Core Logic processed in Service
 		if err := incomingSvc.ProcessDepositCallback(body, signature, timestamp); err != nil {
-			log.Printf("Error processing deposit callback: %v", err)
+			utils.LogEvent("errors", "Error processing deposit callback: "+err.Error())
 			// Decide the response based on the error
 			status := http.StatusInternalServerError
 			if err.Error() == "invalid signature" {

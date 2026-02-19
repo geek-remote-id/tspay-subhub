@@ -45,3 +45,27 @@ func LogToFile(prefix string, headers http.Header, body []byte) {
 		log.Printf("Error writing to log file: %v", err)
 	}
 }
+
+// LogEvent saves a simple string message into a file with year/month/day folder structure
+func LogEvent(prefix string, message string) {
+	now := time.Now()
+	dirPath := filepath.Join("logs", now.Format("2006"), now.Format("01"), now.Format("02"))
+
+	if err := os.MkdirAll(dirPath, 0755); err != nil {
+		log.Printf("Error creating log directory: %v", err)
+		return
+	}
+
+	filePath := filepath.Join(dirPath, fmt.Sprintf("%s.log", prefix))
+	f, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Printf("Error opening log file: %v", err)
+		return
+	}
+	defer f.Close()
+
+	logEntry := fmt.Sprintf("[%s] %s\n", now.Format("15:04:05"), message)
+	if _, err := f.WriteString(logEntry); err != nil {
+		log.Printf("Error writing to log file: %v", err)
+	}
+}

@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/geek-remote-id/tspay-subhub/utils"
 	"github.com/spf13/viper"
 )
 
@@ -39,12 +40,12 @@ func (s *TspayService) VerifyWebhookSignature(isDeposit bool, payload []byte, si
 	currentTime := time.Now().Unix()
 	webhookTime, err := strconv.ParseInt(timestamp, 10, 64)
 	if err != nil {
-		log.Printf("Error parsing webhook timestamp: %v", err)
+		utils.LogEvent("errors", "Error parsing webhook timestamp: "+err.Error())
 		return false
 	}
 
 	if math.Abs(float64(currentTime-webhookTime)) > float64(s.toleranceSeconds) {
-		log.Printf("Webhook timestamp outside tolerance window: current=%d, webhook=%d", currentTime, webhookTime)
+		utils.LogEvent("errors", fmt.Sprintf("Webhook timestamp outside tolerance window: current=%d, webhook=%d", currentTime, webhookTime))
 		return false
 	}
 
