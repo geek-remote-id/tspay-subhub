@@ -61,7 +61,7 @@ func main() {
 
 	// Routes
 	http.HandleFunc("/health", healthHandler)
-	http.HandleFunc("/api/incoming", handlers.GenerateIncomingHandler())
+	http.HandleFunc("/api/incoming/deposit_callback", handlers.GenerateDepositCallbackHandler())
 
 	// Swagger
 	http.HandleFunc("/", httpSwagger.WrapHandler)

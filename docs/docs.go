@@ -38,9 +38,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/incoming": {
-            "get": {
-                "description": "Handles incoming requests for Tspay Subhub",
+        "/incoming/deposit_callback": {
+            "post": {
+                "description": "Handles incoming deposit callback requests from Tspay",
                 "consumes": [
                     "application/json"
                 ],
@@ -50,7 +50,7 @@ const docTemplate = `{
                 "tags": [
                     "incoming"
                 ],
-                "summary": "Incoming Handler",
+                "summary": "Deposit Callback Handler",
                 "responses": {
                     "200": {
                         "description": "OK",

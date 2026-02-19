@@ -29,11 +29,11 @@ paths:
       summary: Health Check
       tags:
       - health
-  /incoming:
-    get:
+  /incoming/deposit_callback:
+    post:
       consumes:
       - application/json
-      description: Handles incoming requests for Tspay Subhub
+      description: Handles incoming deposit callback requests from Tspay
       produces:
       - application/json
       responses:
@@ -41,7 +41,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/utils.Response'
-      summary: Incoming Handler
+      summary: Deposit Callback Handler
       tags:
       - incoming
 swagger: "2.0"
