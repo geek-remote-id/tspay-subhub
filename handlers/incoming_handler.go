@@ -22,22 +22,7 @@ func GenerateDepositCallbackHandler() http.HandlerFunc {
 	incomingSvc := services.NewIncomingService(tspaySvc)
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Response{
-				Status:  "error",
-				Message: "Method not allowed",
-			})
-			return
-		}
-
-		// Handle webhook
-		signature := r.Header.Get("X-Webhook-Signature")
-		timestamp := r.Header.Get("X-Webhook-Timestamp")
-
-		log.Printf("Incoming ctl @ deposit_callback signature = %s", signature)
-		log.Printf("Incoming ctl @ deposit_callback timestamp = %s", timestamp)
-
-		// Read body
+		// 1. Read body first so we can log it (Body can only be read once)
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			log.Printf("Error reading body: %v", err)
@@ -49,10 +34,25 @@ func GenerateDepositCallbackHandler() http.HandlerFunc {
 		}
 		defer r.Body.Close()
 
-		// Log request for debugging
+		// 2. Log EVERYTHING immediately to file
 		utils.LogToFile("deposit_callback", r.Header, body)
 
-		// Core Logic processed in Service
+		// 3. Method check
+		if r.Method != http.MethodPost {
+			log.Printf("Method %s not allowed", r.Method)
+			utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Response{
+				Status:  "error",
+				Message: "Method not allowed",
+			})
+			return
+		}
+
+		// 4. Handle webhook headers
+		signature := r.Header.Get("X-Webhook-Signature")
+		timestamp := r.Header.Get("X-Webhook-Timestamp")
+		log.Printf("Incoming signature = %s, timestamp = %s", signature, timestamp)
+
+		// 5. Core Logic processed in Service
 		if err := incomingSvc.ProcessDepositCallback(body, signature, timestamp); err != nil {
 			log.Printf("Error processing deposit callback: %v", err)
 			// Decide the response based on the error

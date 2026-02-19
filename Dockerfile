@@ -43,7 +43,7 @@ COPY --from=builder /app/main .
 # COPY .env .
 
 # Expose the application port (matching the default in main.go)
-EXPOSE 6060
+EXPOSE 2139
 
 # Command to run the application
 ENTRYPOINT ["./main"]
