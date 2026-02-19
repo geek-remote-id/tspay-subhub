@@ -46,8 +46,8 @@ func LogToFile(prefix string, headers http.Header, body []byte) {
 	}
 }
 
-// LogEvent saves a simple string message into a file with year/month/day folder structure
-func LogEvent(prefix string, message string) {
+// LogEvent saves a formatted string message into a file with year/month/day folder structure
+func LogEvent(prefix string, format string, a ...interface{}) {
 	now := time.Now()
 	dirPath := filepath.Join("logs", now.Format("2006"), now.Format("01"), now.Format("02"))
 
@@ -64,6 +64,7 @@ func LogEvent(prefix string, message string) {
 	}
 	defer f.Close()
 
+	message := fmt.Sprintf(format, a...)
 	logEntry := fmt.Sprintf("[%s] %s\n", now.Format("15:04:05"), message)
 	if _, err := f.WriteString(logEntry); err != nil {
 		log.Printf("Error writing to log file: %v", err)

@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"log"
 	"math"
 	"strconv"
 	"strings"
@@ -36,17 +35,17 @@ func NewTspayService() *TspayService {
 
 // VerifyWebhookSignature verifies the signature of the incoming webhook
 func (s *TspayService) VerifyWebhookSignature(isDeposit bool, payload []byte, signature string, timestamp string) bool {
-	// Check timestamp tolerance
+
 	currentTime := time.Now().Unix()
 	webhookTime, err := strconv.ParseInt(timestamp, 10, 64)
 	if err != nil {
-		utils.LogEvent("errors", "Error parsing webhook timestamp: "+err.Error())
-		return false
-	}
-
-	if math.Abs(float64(currentTime-webhookTime)) > float64(s.toleranceSeconds) {
-		utils.LogEvent("errors", fmt.Sprintf("Webhook timestamp outside tolerance window: current=%d, webhook=%d", currentTime, webhookTime))
-		return false
+		utils.LogEvent("events", "Warning: Could not parse timestamp '%s' as number, skipping tolerance check.", timestamp)
+	} else {
+		// Only check tolerance if we have a valid numeric timestamp
+		if math.Abs(float64(currentTime-webhookTime)) > float64(s.toleranceSeconds) {
+			utils.LogEvent("errors", "Webhook timestamp outside tolerance window: current=%d, webhook=%d", currentTime, webhookTime)
+			return false
+		}
 	}
 
 	// Remove 'sha256=' prefix if present
@@ -60,13 +59,15 @@ func (s *TspayService) VerifyWebhookSignature(isDeposit bool, payload []byte, si
 
 	// Compute expected signature
 	message := fmt.Sprintf("%s.%s", timestamp, string(payload))
+	utils.LogEvent("events", "Incoming ctl @ deposit_callback message = %s", message)
+
 	h := hmac.New(sha256.New, []byte(secret))
 	h.Write([]byte(message))
 	expectedSignature := hex.EncodeToString(h.Sum(nil))
 
-	log.Printf("Incoming ctl @ deposit_callback secret = %s", secret)
-	log.Printf("Incoming ctl @ deposit_callback expectedSignature = %s", expectedSignature)
-	log.Printf("Incoming ctl @ deposit_callback signature = %s", signature)
+	utils.LogEvent("events", "Incoming ctl @ deposit_callback secret = %s", secret)
+	utils.LogEvent("events", "Incoming ctl @ deposit_callback expectedSignature = %s", expectedSignature)
+	utils.LogEvent("events", "Incoming ctl @ deposit_callback signature = %s", signature)
 
 	// Constant-time comparison
 	return hmac.Equal([]byte(expectedSignature), []byte(signature))
