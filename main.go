@@ -5,22 +5,32 @@ import (
 	"log"
 	"net/http"
 
-	"kasir-api/database"
-	"kasir-api/docs"
-	"kasir-api/handlers"
-	"kasir-api/repositories"
-	"kasir-api/services"
-	"kasir-api/utils"
+	"github.com/geek-remote-id/tspay-subhub/docs"
+	"github.com/geek-remote-id/tspay-subhub/handlers"
+	"github.com/geek-remote-id/tspay-subhub/utils"
 
-	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-// @title           Kasir API
+// @title           Tspay Subhub API
 // @version         1.0
-// @description     This is a sample server for a Cashier System.
+// @description     API Server for Tspay Subhub.
 // @BasePath        /api
+
+// @Summary Health Check
+// @Description Get the status of the API
+// @Tags health
+// @Accept json
+// @Produce json
+// @Success 200 {object} utils.Response
+// @Router /health [get]
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	utils.WriteJSON(w, http.StatusOK, utils.Response{
+		Status:  "success",
+		Message: "API Running",
+	})
+}
 
 func main() {
 	// load .env using viper
@@ -49,155 +59,15 @@ func main() {
 	}
 	log.Println("Swagger Host set to:", docs.SwaggerInfo.Host)
 
-	// connect to DB
-	dbConnStr := viper.GetString("DATABASE_URL")
-	db, err := database.Connect(dbConnStr)
-	if err != nil {
-		log.Fatal("Error connecting to database:", err)
-	}
-	defer db.Close()
-
-	fmt.Println("Successfully connected to database!")
-
-	// {{host}}/health
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		utils.WriteJSON(w, http.StatusOK, utils.Response{
-			Status:  "success",
-			Message: "API Running",
-		})
-	})
+	// Routes
+	http.HandleFunc("/health", healthHandler)
+	http.HandleFunc("/api/incoming", handlers.GenerateIncomingHandler())
 
 	// Swagger
 	http.HandleFunc("/", httpSwagger.WrapHandler)
 
-	// Routes
-	http.HandleFunc("/api/category/", func(w http.ResponseWriter, r *http.Request) {
-		categoryRepo := repositories.NewCategoryRepository(db)
-		categoryService := services.NewCategoryService(categoryRepo)
-		categoryHandler := handlers.NewCategoryHandler(categoryService)
-
-		switch r.Method {
-		case "GET":
-			categoryHandler.GetCategoryByID(w, r)
-		case "PUT":
-			categoryHandler.UpdateCategory(w, r)
-		case "DELETE":
-			categoryHandler.DeleteCategory(w, r)
-		default:
-			utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Response{
-				Status:  "failed",
-				Message: "Method not allowed",
-			})
-		}
-	})
-
-	http.HandleFunc("/api/category", func(w http.ResponseWriter, r *http.Request) {
-		categoryRepo := repositories.NewCategoryRepository(db)
-		categoryService := services.NewCategoryService(categoryRepo)
-		categoryHandler := handlers.NewCategoryHandler(categoryService)
-
-		switch r.Method {
-		case "GET":
-			categoryHandler.GetCategories(w, r)
-		case "POST":
-			categoryHandler.CreateCategory(w, r)
-		default:
-			utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Response{
-				Status:  "failed",
-				Message: "Method not allowed",
-			})
-		}
-	})
-
-	http.HandleFunc("/api/product/", func(w http.ResponseWriter, r *http.Request) {
-		productRepo := repositories.NewProductRepository(db)
-		productService := services.NewProductService(productRepo)
-		productHandler := handlers.NewProductHandler(productService)
-
-		switch r.Method {
-		case "GET":
-			productHandler.GetProductByID(w, r)
-		case "PUT":
-			productHandler.UpdateProduct(w, r)
-		case "DELETE":
-			productHandler.DeleteProduct(w, r)
-		default:
-			utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Response{
-				Status:  "failed",
-				Message: "Method not allowed",
-			})
-		}
-	})
-
-	http.HandleFunc("/api/product", func(w http.ResponseWriter, r *http.Request) {
-		productRepo := repositories.NewProductRepository(db)
-		productService := services.NewProductService(productRepo)
-		productHandler := handlers.NewProductHandler(productService)
-
-		switch r.Method {
-		case "GET":
-			productHandler.GetProducts(w, r)
-		case "POST":
-			productHandler.CreateProduct(w, r)
-		default:
-			utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Response{
-				Status:  "failed",
-				Message: "Method not allowed",
-			})
-		}
-	})
-
-	http.HandleFunc("/api/checkout", func(w http.ResponseWriter, r *http.Request) {
-		transactionRepo := repositories.NewTransactionRepository(db)
-		transactionService := services.NewTransactionService(transactionRepo)
-		transactionHandler := handlers.NewTransactionHandler(transactionService)
-
-		switch r.Method {
-		case "POST":
-			transactionHandler.Checkout(w, r)
-		default:
-			utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Response{
-				Status:  "failed",
-				Message: "Method not allowed",
-			})
-		}
-	})
-
-	// sales summary
-	http.HandleFunc("/api/report/hari-ini", func(w http.ResponseWriter, r *http.Request) {
-		reportRepo := repositories.NewReportRepository(db)
-		reportService := services.NewReportService(reportRepo)
-		reportHandler := handlers.NewReportHandler(reportService)
-
-		switch r.Method {
-		case "GET":
-			reportHandler.GetDailySalesReport(w, r)
-		default:
-			utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Response{
-				Status:  "failed",
-				Message: "Method not allowed",
-			})
-		}
-	})
-
-	http.HandleFunc("/api/report", func(w http.ResponseWriter, r *http.Request) {
-		reportRepo := repositories.NewReportRepository(db)
-		reportService := services.NewReportService(reportRepo)
-		reportHandler := handlers.NewReportHandler(reportService)
-
-		switch r.Method {
-		case "GET":
-			reportHandler.GetSalesReportByDateRange(w, r)
-		default:
-			utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Response{
-				Status:  "failed",
-				Message: "Method not allowed",
-			})
-		}
-	})
-
 	fmt.Println("Server running on http://localhost:" + portStr)
-	err = http.ListenAndServe(":"+portStr, nil)
+	err := http.ListenAndServe(":"+portStr, nil)
 	if err != nil {
 		fmt.Println("Error running server:", err)
 	}
