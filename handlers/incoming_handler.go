@@ -24,6 +24,14 @@ func GenerateDepositCallbackHandler() http.HandlerFunc {
 	tspaySvc := services.NewTspayService()
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			utils.WriteJSON(w, http.StatusMethodNotAllowed, utils.Response{
+				Status:  "error",
+				Message: "Method not allowed",
+			})
+			return
+		}
+
 		// Handle webhook
 		signature := r.Header.Get("X-Webhook-Signature")
 		timestamp := r.Header.Get("X-Webhook-Timestamp")

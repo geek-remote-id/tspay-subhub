@@ -15,12 +15,12 @@ func Connect(connStr string) (*sql.DB, error) {
 	}
 
 	// Add timezone parameter if not already present
-	// This ensures all timestamps are in Asia/Jakarta timezone (UTC+7)
+	// This ensures all timestamps are in Asia/Kuala_Lumpur timezone (UTC+8)
 	if !contains(connStr, "timezone=") {
 		if contains(connStr, "?") {
-			connStr += "&timezone=Asia/Jakarta"
+			connStr += "&timezone=Asia/Kuala_Lumpur"
 		} else {
-			connStr += "?timezone=Asia/Jakarta"
+			connStr += "?timezone=Asia/Kuala_Lumpur"
 		}
 	}
 

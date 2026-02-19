@@ -1,0 +1,23 @@
+# Git
+.git
+.gitignore
+
+# Go
+bin/
+*.exe
+*.test
+vendor/
+
+# Configuration
+.env
+*.local
+
+# Documentation / Metadata
+.antigravity/
+.agent/
+.vscode/
+.idea/
+
+# Docker
+Dockerfile
+.dockerignore
