@@ -10,6 +10,6 @@ services:
     env_file:
       - .env
     volumes:
-      - ../logs:/app/logs # Mounting host 'logs' folder to container '/app/logs'
+      - ./logs:/app/logs # Mounting host 'logs' folder to container '/app/logs'
     # Optional: ensure logs directory exists on host or it will be created as root by Docker
     # In Windows, this is usually fine.
