@@ -34,6 +34,9 @@ func GenerateDepositCallbackHandler() http.HandlerFunc {
 		signature := r.Header.Get("X-Webhook-Signature")
 		timestamp := r.Header.Get("X-Webhook-Timestamp")
 
+		log.Printf("Incoming ctl @ deposit_callback signature = %s", signature)
+		log.Printf("Incoming ctl @ deposit_callback timestamp = %s", timestamp)
+
 		// Read body
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
@@ -45,6 +48,9 @@ func GenerateDepositCallbackHandler() http.HandlerFunc {
 			return
 		}
 		defer r.Body.Close()
+
+		// Log request for debugging
+		utils.LogToFile("deposit_callback", r.Header, body)
 
 		// Core Logic processed in Service
 		if err := incomingSvc.ProcessDepositCallback(body, signature, timestamp); err != nil {

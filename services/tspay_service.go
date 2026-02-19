@@ -63,6 +63,10 @@ func (s *TspayService) VerifyWebhookSignature(isDeposit bool, payload []byte, si
 	h.Write([]byte(message))
 	expectedSignature := hex.EncodeToString(h.Sum(nil))
 
+	log.Printf("Incoming ctl @ deposit_callback secret = %s", secret)
+	log.Printf("Incoming ctl @ deposit_callback expectedSignature = %s", expectedSignature)
+	log.Printf("Incoming ctl @ deposit_callback signature = %s", signature)
+
 	// Constant-time comparison
 	return hmac.Equal([]byte(expectedSignature), []byte(signature))
 }
